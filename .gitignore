@@ -21,3 +21,4 @@ pythonenv*
 
 # Pycharm
 .idea/
+migrations/
