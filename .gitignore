@@ -22,3 +22,4 @@ pythonenv*
 # Pycharm
 .idea/
 migrations/
+_media
