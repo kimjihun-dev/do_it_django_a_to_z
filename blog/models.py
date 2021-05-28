@@ -3,6 +3,17 @@ from django.contrib.auth.models import User
 import os
 
 
+class Category(models.Model):
+    name = models.CharField(max_length=50, unique=True)
+    slug = models.SlugField(max_length=200, unique=True, allow_unicode=True)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name_plural = 'Categories'
+
+
 class Post(models.Model):
     title = models.CharField(max_length=30)
     hook_text = models.CharField(max_length=100, blank=True)
@@ -16,6 +27,9 @@ class Post(models.Model):
 
     # 사용자가 삭제되어도 해당 사용자가 작성한 글은 남아있게끔 (None 로 포현됨)
     author = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
+
+    # 포스트 = 카테고리가 연결된 상태에서 카테고리가 삭제된 경우 연결된 포스트는 삭제안됨. (카테고리만 null)
+    category = models.ForeignKey(Category, null=True, blank=True, on_delete=models.SET_NULL)
 
     def __str__(self):
         return f'[{self.pk}]{self.title} :: {self.author}'
