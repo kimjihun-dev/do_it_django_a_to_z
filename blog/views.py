@@ -44,6 +44,7 @@ class PostCreate(LoginRequiredMixin, UserPassesTestMixin, CreateView):
             response = super(PostCreate, self).form_valid(form)
 
             tags_str = self.request.POST.get('tags_str')
+
             if tags_str:
                 tags_str = tags_str.strip()
 
