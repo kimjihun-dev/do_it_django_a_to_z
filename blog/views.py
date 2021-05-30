@@ -70,6 +70,37 @@ class PostUpdate(UpdateView):
 
     template_name = 'blog/post_update_form.html'
 
+    def get_context_data(self, **kwargs):
+        context = super(PostUpdate, self).get_context_data()
+        if self.object.tag.exists():
+            tags_str_list = list()
+            for t in self.object.tag.all():
+                tags_str_list.append(t.name)
+            context['tags_str_default'] = '; '.join(tags_str_list)
+
+        return context
+
+    def form_valid(self, form):
+        response = super(PostUpdate, self).form_valid(form)
+        self.object.tag.clear()
+
+        tags_str = self.request.POST.get('tags_str')
+
+        if tags_str:
+            tags_str = tags_str.strip()
+            tags_str = tags_str.replace(',', ';')
+            tags_list = tags_str.split(';')
+
+            for t in tags_list:
+                t = t.strip()
+                tag, is_tag_created = Tag.objects.get_or_create(name=t)
+                if is_tag_created:
+                    tag.slug = slugify(t, allow_unicode=True)
+                    tag.save()
+                self.object.tag.add(tag)
+
+        return response
+
     def dispatch(self, request, *args, **kwargs):
         # self.get_object().author 은 UpdateView 의 메서드 (Post.objects.get(pk=pk)) 와 같은 역활
         if request.user.is_authenticated and request.user == self.get_object().author:
